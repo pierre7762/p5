@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct Calculator {
     
@@ -66,42 +67,104 @@ struct Calculator {
         elements = []
     }
     
-    mutating func findPriorityCalculate() -> [String]{
-        var newArray: [String] = [""]
+    func findPriorityCalculate() -> [String] {
+        var newArray: [String] = []
         let arraySize = elements.count
-        var position = 0
-        var result = 0.0
-        for i in 0 ... arraySize {
-            if i < arraySize - 1 {
-                let element: String = elements[i]
-                
-                if element == "x" || element == "/" {
-                    let firstIndex = elements.index(before: position)
-                    let firstNumber = elements[firstIndex]
-                    print(firstNumber)
-                    print(element)
-                    let secondNumber = elements[elements.index(after: position)]
-                    print(secondNumber)
-                    
-                    if element == "x" {
-                        result = multipication(a: Double(firstNumber)!, b: Double(secondNumber)!)
-                        print("result : \(result)")
-                    } else {
-                        result = division(a: Double(firstNumber)!, b: Double(secondNumber)!)
-                    }
-                    
-                    elements[position] = String(result)
-                    elements.remove(at: position - 1)
-                    elements.remove(at: position)
-                    
-                    print(elements)
-                }
-                
-                position += 1
-            }
+        let indexMax = arraySize - 1
+        
+        for i in 0 ... arraySize - 1 {
+            let element = elements[i]
             
+            
+            if i == 0 {
+                newArray.append(element)
+            } else if i == indexMax {
+                if element != "+" && element != "-" && element != "x" && element != "/" {
+                    let beforeElement = elements[i - 1]
+                    if beforeElement != "x" && beforeElement != "/" {
+                        newArray.append(element)
+                    }
+                }
+            } else {
+                
+                let beforeElement = elements[i - 1]
+                
+                print("element : \(element) | index : \(i)")
+                
+                //i is a number
+                if element != "+" && element != "-" && element != "x" && element != "/" {
+                    if (i+1) <= indexMax {
+                        let nextElement = elements[i + 1]
+                        if nextElement == "+" || nextElement == "-" {
+                            if beforeElement != "x" && beforeElement != "/" {
+                                newArray.append(element)
+                            }
+                        }
+                    } else {
+                        newArray.append(element)
+                    }
+                //i is + or -
+                } else if element == "+" || element == "-" {
+                    newArray.append(element)
+                    
+                //i is x
+                } else if element == "x" {
+                    let firstNumber = elements[i - 1]
+                    let secondNumber = elements[i + 1]
+                    let result = String(multipication(a: Double(firstNumber)!, b: Double(secondNumber)!))
+                    newArray.append(result)
+                    
+                    print("multiplication : \(firstNumber) x \(secondNumber) = \(result)")
+                
+                //i is /
+                } else {
+                    let firstNumber = elements[i - 1]
+                    let secondNumber = elements[i + 1]
+                    let result = String(division(a: Double(firstNumber)!, b: Double(secondNumber)!))
+                    newArray.append(result)
+                    
+                    print("division : \(firstNumber) / \(secondNumber) = \(result)")
+                }
+            }
         }
+        print("The new array is : \(newArray)")
+        
         return newArray
+    }
+    
+    func makeAdditionAndSubstraction(data: [String]) -> Double{
+        var finalResult = 0.0
+        let arraySize = data.count
+        
+        if arraySize > 0 {
+            let indexMax = arraySize - 1
+            
+            for i in 0 ... indexMax - 1{
+                let element = data[i]
+                
+                if i == 0 {
+                    finalResult = Double(element)!
+                } else {
+                    let nextElement = data[i + 1]
+                    
+                    if element == "+" {
+                        finalResult = addition(a: finalResult, b: Double(nextElement)!)
+                    } else {
+                        finalResult = substraction(a: finalResult, b: Double(nextElement)!)
+                    }
+                }
+            }
+        }
+        return finalResult
+    }
+    
+    func giveResult() -> String {
+        var newArrayLessMultiAndDivi = findPriorityCalculate()
+        var result = makeAdditionAndSubstraction(data: newArrayLessMultiAndDivi)
+        
+        let resultText = " = \(result)"
+        
+        return resultText
     }
     
 //    // Create local copy of operations
