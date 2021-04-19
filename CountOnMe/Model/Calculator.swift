@@ -16,7 +16,7 @@ struct Calculator {
     
     // Error check computed variables
     var expressionIsCorrect: Bool {
-        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/"
+        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.first != "+" && elements.first != "x" && elements.first != "/"
     }
     
     var expressionHaveEnoughElement: Bool {
@@ -42,29 +42,62 @@ struct Calculator {
     }
     
     //MARK: Functions
-    
-    func addition(a: Double, b: Double) -> Double {
-        return a + b
-    }
-    
-    func substraction(a: Double, b: Double) -> Double {
-        return a - b
-    }
-    
-    func multipication(a: Double, b: Double) -> Double {
-        return a * b
-    }
-    
-    func division(a: Double, b: Double) -> Double {
-        return a / b
-    }
-    
     func updateElements(text: String) -> [String] {
         return text.split(separator: " ").map { "\($0)" }
     }
     
     mutating func resetCalculator() {
         elements = []
+    }
+    
+    private func addition(a: Double, b: Double) -> Double {
+        return a + b
+    }
+    
+    private func substraction(a: Double, b: Double) -> Double {
+        return a - b
+    }
+    
+    private func multipication(a: Double, b: Double) -> Double {
+        return a * b
+    }
+    
+    private func division(a: Double, b: Double) -> Double {
+        return a / b
+    }
+    
+    private func elementIsNotOperator(element: String) -> Bool {
+        if element != "+" && element != "-" && element != "x" && element != "/" {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    private func elementIsMultiplication(elements: [String], i: Int) -> String {
+        let firstNumber = elements[i - 1]
+        let secondNumber = elements[i + 1]
+        let result = String(multipication(a: Double(firstNumber)!, b: Double(secondNumber)!))
+        print("multiplication : \(firstNumber) x \(secondNumber) = \(result)")
+        
+        return result
+    }
+    
+    private func elementIsDevision(elements: [String], i: Int) -> String {
+        let firstNumber = elements[i - 1]
+        let secondNumber = elements[i + 1]
+        let result = String(division(a: Double(firstNumber)!, b: Double(secondNumber)!))
+        print("multiplication : \(firstNumber) / \(secondNumber) = \(result)")
+        
+        return result
+    }
+    
+    private func checkIfIsNotDevisionByZero(firstElement: String, secondElement: String) -> Bool{
+        if firstElement != "0" && secondElement != "0" {
+            return true
+        } else {
+            return false
+        }
     }
     
     func findPriorityCalculate() -> [String] {
@@ -75,24 +108,30 @@ struct Calculator {
         for i in 0 ... arraySize - 1 {
             let element = elements[i]
             
-            
             if i == 0 {
-                newArray.append(element)
+                let nextElement = elements[i + 1]
+                if nextElement == "+" || nextElement == "-" {
+                    newArray.append(element)
+                } else if element == "-" {
+                    
+                    if elementIsNotOperator(element: nextElement) {
+                        newArray.append(element)
+                    }
+                }
+                
             } else if i == indexMax {
-                if element != "+" && element != "-" && element != "x" && element != "/" {
+                if elementIsNotOperator(element: element) {
                     let beforeElement = elements[i - 1]
                     if beforeElement != "x" && beforeElement != "/" {
                         newArray.append(element)
                     }
                 }
             } else {
-                
                 let beforeElement = elements[i - 1]
-                
                 print("element : \(element) | index : \(i)")
                 
                 //i is a number
-                if element != "+" && element != "-" && element != "x" && element != "/" {
+                if elementIsNotOperator(element: element) {
                     if (i+1) <= indexMax {
                         let nextElement = elements[i + 1]
                         if nextElement == "+" || nextElement == "-" {
@@ -109,21 +148,15 @@ struct Calculator {
                     
                 //i is x
                 } else if element == "x" {
-                    let firstNumber = elements[i - 1]
-                    let secondNumber = elements[i + 1]
-                    let result = String(multipication(a: Double(firstNumber)!, b: Double(secondNumber)!))
-                    newArray.append(result)
-                    
-                    print("multiplication : \(firstNumber) x \(secondNumber) = \(result)")
+                    newArray.append(elementIsMultiplication(elements: elements, i: i))
                 
                 //i is /
                 } else {
-                    let firstNumber = elements[i - 1]
-                    let secondNumber = elements[i + 1]
-                    let result = String(division(a: Double(firstNumber)!, b: Double(secondNumber)!))
-                    newArray.append(result)
-                    
-                    print("division : \(firstNumber) / \(secondNumber) = \(result)")
+                    if checkIfIsNotDevisionByZero(firstElement: elements[i - 1], secondElement: elements[i + 1]){
+                        newArray.append(elementIsDevision(elements: elements, i: i))
+                    } else {
+                        newArray.append(" / 0 = impossible")
+                    }
                 }
             }
         }
@@ -132,63 +165,60 @@ struct Calculator {
         return newArray
     }
     
-    func makeAdditionAndSubstraction(data: [String]) -> Double{
+    func makeAdditionAndSubstraction(data: [String]) -> String{
         var finalResult = 0.0
         let arraySize = data.count
+        let indexMax = arraySize - 1
+        var operatorUse = ""
         
-        if arraySize > 0 {
-            let indexMax = arraySize - 1
-            
-            for i in 0 ... indexMax - 1{
+        if indexMax >= 0 {
+            for i in 0 ... indexMax {
                 let element = data[i]
                 
-                if i == 0 {
-                    finalResult = Double(element)!
-                } else {
-                    let nextElement = data[i + 1]
-                    
-                    if element == "+" {
-                        finalResult = addition(a: finalResult, b: Double(nextElement)!)
-                    } else {
-                        finalResult = substraction(a: finalResult, b: Double(nextElement)!)
+                if element != " / 0 = impossible" {
+                    if i == 0 {
+                        if element == "-" {
+                            
+                            operatorUse = "-"
+                        } else {
+                            finalResult = Double(element)!
+                        }
+                        
+                    } else if element != "+" && element != "-" {
+                        if operatorUse == "+" {
+                            finalResult = addition(a: finalResult, b: Double(element)!)
+                            operatorUse = ""
+                            print("result after addition : \(finalResult)")
+                        } else if operatorUse == "-" {
+                            finalResult = substraction(a: finalResult, b: Double(element)!)
+                            operatorUse = ""
+                            print("result after substraction : \(finalResult)")
+                        } else {
+                            print("error : !")
+                        }
+                    } else if element == "+" {
+                        operatorUse = "+"
+                    } else if element == "-" {
+                        operatorUse = "-"
                     }
+                } else {
+                    return " : impossible"
                 }
             }
         }
-        return finalResult
+        print(finalResult)
+        return String(finalResult)
     }
     
     func giveResult() -> String {
-        var newArrayLessMultiAndDivi = findPriorityCalculate()
-        var result = makeAdditionAndSubstraction(data: newArrayLessMultiAndDivi)
-        
-        let resultText = " = \(result)"
-        
-        return resultText
+        let newArrayLessMultiAndDivi = findPriorityCalculate()
+        print("in func giveResult newArrayless ... = \(newArrayLessMultiAndDivi)")
+        let result = makeAdditionAndSubstraction(data: newArrayLessMultiAndDivi)
+        print("result = \(result)")
+
+        return result
     }
     
-//    // Create local copy of operations
-//    var operationsToReduce = elements
-//
-//    // Iterate over operations while an operand still here
-//    while operationsToReduce.count > 1 {
-//        let left = Int(operationsToReduce[0])!
-//        let operand = operationsToReduce[1]
-//        let right = Int(operationsToReduce[2])!
-//
-//        let result: Int
-//        switch operand {
-//        case "+": result = left + right
-//        case "-": result = left - right
-//        default: fatalError("Unknown operator !")
-//        }
-//
-//        operationsToReduce = Array(operationsToReduce.dropFirst(3))
-//        operationsToReduce.insert("\(result)", at: 0)
-//    }
-//
-//    textView.text.append(" = \(operationsToReduce.first!)")
-
 }
 
 
