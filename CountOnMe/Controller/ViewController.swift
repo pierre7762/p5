@@ -13,39 +13,22 @@ class ViewController: UIViewController {
     @IBOutlet var numberButtons: [UIButton]!
     
     var calculator = Calculator()
-
+    
+    var expressionIsCorrect: Bool {
+        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.first != "+" && elements.first != "x" && elements.first != "/"
+    }
     
     var elements: [String] {
         calculator.elements = calculator.updateElements(text: textView.text)
         return calculator.elements
-    }
-    
-    // Error check computed variables
-    var expressionIsCorrect: Bool {
-        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/"
-    }
-
-    var expressionHaveEnoughElement: Bool {
-        return elements.count >= 3
-    }
-
-
-    var expressionHaveResult: Bool {
-        return textView.text.firstIndex(of: "=") != nil
     }
 
     // View Life cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        reset()
+        calculator.reset(textView: textView)
     }
-    
-    private func reset() {
-        calculator.resetCalculator()
-        textView.text = ""
-    }
-    
     
     // View actions
     @IBAction func tappedNumberButton(_ sender: UIButton) {
@@ -54,12 +37,12 @@ class ViewController: UIViewController {
                 textView.text.append(numberText)
             } else {
                 //reset calculator
-                reset()
+                calculator.reset(textView: textView)
                 return
             }
         }
         
-        if expressionHaveResult {
+        if calculator.hasExpressionResult(textView: textView) {
             textView.text = ""
         }
     }
@@ -94,7 +77,7 @@ class ViewController: UIViewController {
             textView.text.append(" x ")
         } else {
             let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            reset()
+            calculator.reset(textView: textView)
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alertVC, animated: true, completion: nil)
         }
@@ -107,7 +90,7 @@ class ViewController: UIViewController {
             textView.text.append(" / ")
         } else {
             let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            reset()
+            calculator.reset(textView: textView)
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alertVC, animated: true, completion: nil)
         }
@@ -115,16 +98,16 @@ class ViewController: UIViewController {
     
     
     @IBAction func tappedEqualButton(_ sender: UIButton) {
-        guard calculator.expressionIsCorrect else {
+        guard expressionIsCorrect else {
             let alertVC = UIAlertController(title: "Zéro!", message: "Entrez une expression correcte !", preferredStyle: .alert)
-            reset()
+            calculator.reset(textView: textView)
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             return self.present(alertVC, animated: true, completion: nil)
         }
         
-        guard expressionHaveEnoughElement else {
+        guard calculator.expressionHaveEnoughElement else {
             let alertVC = UIAlertController(title: "Zéro!", message: "Démarrez un nouveau calcul !", preferredStyle: .alert)
-            reset()
+            calculator.reset(textView: textView)
             alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             return self.present(alertVC, animated: true, completion: nil)
         }

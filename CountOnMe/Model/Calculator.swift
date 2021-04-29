@@ -15,9 +15,9 @@ struct Calculator {
     var elements: [String] = []
     
     // Error check computed variables
-    var expressionIsCorrect: Bool {
-        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.first != "+" && elements.first != "x" && elements.first != "/"
-    }
+//    var expressionIsCorrect: Bool {
+//        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.first != "+" && elements.first != "x" && elements.first != "/"
+//    }
     
     var expressionHaveEnoughElement: Bool {
         return elements.count >= 3
@@ -32,7 +32,9 @@ struct Calculator {
         return ok
     }
     
-    var expressionHaveResult: Bool = false
+    func hasExpressionResult(textView: UITextView) -> Bool {
+        return textView.text.firstIndex(of: "=") != nil
+    }
     
     enum Operand {
         case addition
@@ -46,8 +48,9 @@ struct Calculator {
         return text.split(separator: " ").map { "\($0)" }
     }
     
-    mutating func resetCalculator() {
+    mutating func reset(textView: UITextView) {
         elements = []
+        textView.text = ""
     }
     
     private func addition(a: Double, b: Double) -> Double {
@@ -148,7 +151,26 @@ struct Calculator {
                     
                 //i is x
                 } else if element == "x" {
-                    newArray.append(elementIsMultiplication(elements: elements, i: i))
+                    //check if is a succession of multiplications
+                    if i > 3 {
+                        let elementLessTwo = elements[-2]
+                        if elementLessTwo == "x" || elementLessTwo == "/" {
+                            let lastElementInNewArray = Double(newArray.last!)
+                            let lastIndexInNewArray = newArray.count - 1
+                            
+                            let result = lastElementInNewArray! * Double(elements[i + 1])!
+                            
+                            newArray[lastIndexInNewArray] = String(result)
+                            
+                            
+                        } else {
+                            newArray.append(elementIsMultiplication(elements: elements, i: i))
+                        }
+                    } else {
+                        newArray.append(elementIsMultiplication(elements: elements, i: i))
+                    }
+                    
+                    
                 
                 //i is /
                 } else {
