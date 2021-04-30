@@ -22,6 +22,8 @@ class ViewController: UIViewController {
         calculator.elements = calculator.updateElements(text: textView.text)
         return calculator.elements
     }
+    
+    var result = ""
 
     // View Life cycles
     override func viewDidLoad() {
@@ -32,68 +34,127 @@ class ViewController: UIViewController {
     
     // View actions
     @IBAction func tappedNumberButton(_ sender: UIButton) {
-        if let numberText = sender.title(for: .normal) {
-            if numberText != "AC" {
-                textView.text.append(numberText)
-            } else {
-                //reset calculator
-                calculator.reset(textView: textView)
-                return
+        if calculator.checkIfResultIsGiven() {
+            calculator.reset(textView: textView)
+            
+            if let numberText = sender.title(for: .normal) {
+                if numberText != "AC" {
+                    textView.text.append(numberText)
+                } else {
+                    //reset calculator
+                    calculator.reset(textView: textView)
+                    return
+                }
             }
-        }
-        
-        if calculator.hasExpressionResult(textView: textView) {
-            textView.text = ""
+        } else {
+            if let numberText = sender.title(for: .normal) {
+                if numberText != "AC" {
+                    textView.text.append(numberText)
+                } else {
+                    //reset calculator
+                    calculator.reset(textView: textView)
+                    return
+                }
+            }
         }
     }
     
     @IBAction func tappedAdditionButton(_ sender: UIButton) {
-        print(elements)
-        
-        if calculator.canAddOperator {
-            textView.text.append(" + ")
+        if calculator.resultIsGiven {
+            calculator.resetElementsAndAddBeforeResult(textView: textView)
             
+            if calculator.canAddOperator {
+                textView.text.append(" + ")
+                
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         } else {
-            let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alertVC, animated: true, completion: nil)
+            if calculator.canAddOperator {
+                textView.text.append(" + ")
+                
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         }
+        
+        
     }
     
     @IBAction func tappedSubstractionButton(_ sender: UIButton) {
-        if calculator.canAddOperator {
-            textView.text.append(" - ")
+        if calculator.checkIfResultIsGiven() {
+            calculator.resetElementsAndAddBeforeResult(textView: textView)
+            
+            if calculator.canAddOperator {
+                textView.text.append(" - ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         } else {
-            let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alertVC, animated: true, completion: nil)
+            if calculator.canAddOperator {
+                textView.text.append(" - ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         }
     }
     
     @IBAction func tappedMultiplicationButton(_ sender: UIButton) {
-        print(elements)
-        
-        if calculator.canAddOperator {
-            textView.text.append(" x ")
+        if calculator.checkIfResultIsGiven() {
+            calculator.resetElementsAndAddBeforeResult(textView: textView)
+            
+            if calculator.canAddOperator {
+                textView.text.append(" x ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                calculator.reset(textView: textView)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         } else {
-            let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            calculator.reset(textView: textView)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alertVC, animated: true, completion: nil)
+            if calculator.canAddOperator {
+                textView.text.append(" x ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                calculator.reset(textView: textView)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         }
+        
     }
     
     @IBAction func tappedDivisionButton(_ sender: UIButton) {
-        print(elements)
-        
-        if calculator.canAddOperator {
-            textView.text.append(" / ")
+        if calculator.checkIfResultIsGiven() {
+            calculator.resetElementsAndAddBeforeResult(textView: textView)
+            
+            if calculator.canAddOperator {
+                textView.text.append(" / ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                calculator.reset(textView: textView)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         } else {
-            let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
-            calculator.reset(textView: textView)
-            alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alertVC, animated: true, completion: nil)
+            if calculator.canAddOperator {
+                textView.text.append(" / ")
+            } else {
+                let alertVC = UIAlertController(title: "Zéro!", message: "Un operateur est déja mis !", preferredStyle: .alert)
+                calculator.reset(textView: textView)
+                alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+                self.present(alertVC, animated: true, completion: nil)
+            }
         }
+        
     }
     
     
@@ -113,8 +174,10 @@ class ViewController: UIViewController {
         }
         
         let textResult = calculator.giveResult()
+        result = textResult
         
         textView.text.append(" = \(textResult)")
+        
     }
         
     

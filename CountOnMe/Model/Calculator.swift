@@ -14,13 +14,14 @@ struct Calculator {
     //MARK: Variables
     var elements: [String] = []
     
-    // Error check computed variables
-//    var expressionIsCorrect: Bool {
-//        return elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.first != "+" && elements.first != "x" && elements.first != "/"
-//    }
+    var resultIsGiven = false
+    
+    var resultCalcul = ""
     
     var expressionHaveEnoughElement: Bool {
-        return elements.count >= 3
+//        get{elements.count >= 3}
+//        set{elements = ["2","+","3']}
+        elements.count >= 3
     }
     
     var canAddOperator: Bool {
@@ -32,10 +33,6 @@ struct Calculator {
         return ok
     }
     
-    func hasExpressionResult(textView: UITextView) -> Bool {
-        return textView.text.firstIndex(of: "=") != nil
-    }
-    
     enum Operand {
         case addition
         case substraction
@@ -45,36 +42,51 @@ struct Calculator {
     
     //MARK: Functions
     func updateElements(text: String) -> [String] {
-        return text.split(separator: " ").map { "\($0)" }
+        text.split(separator: " ").map { "\($0)" }
+    }
+    
+    func checkIfResultIsGiven() -> Bool {
+        if resultIsGiven {
+            return true
+        }
+        return false
+    }
+    
+    mutating func resetElementsAndAddBeforeResult(textView: UITextView) {
+        elements = [resultCalcul]
+        resultIsGiven = false
+        
+        textView.text = "\(resultCalcul)"
     }
     
     mutating func reset(textView: UITextView) {
         elements = []
         textView.text = ""
+        resultIsGiven = false
     }
     
     private func addition(a: Double, b: Double) -> Double {
-        return a + b
+        a + b
     }
     
     private func substraction(a: Double, b: Double) -> Double {
-        return a - b
+        a - b
     }
     
     private func multipication(a: Double, b: Double) -> Double {
-        return a * b
+        a * b
     }
     
     private func division(a: Double, b: Double) -> Double {
-        return a / b
+        a / b
     }
     
     private func elementIsNotOperator(element: String) -> Bool {
         if element != "+" && element != "-" && element != "x" && element != "/" {
             return true
-        } else {
-            return false
         }
+        
+        return false
     }
     
     private func elementIsMultiplication(elements: [String], i: Int) -> String {
@@ -98,9 +110,8 @@ struct Calculator {
     private func checkIfIsNotDevisionByZero(firstElement: String, secondElement: String) -> Bool{
         if firstElement != "0" && secondElement != "0" {
             return true
-        } else {
-            return false
         }
+        return false
     }
     
     func findPriorityCalculate() -> [String] {
@@ -116,10 +127,7 @@ struct Calculator {
                 if nextElement == "+" || nextElement == "-" {
                     newArray.append(element)
                 } else if element == "-" {
-                    
-                    if elementIsNotOperator(element: nextElement) {
-                        newArray.append(element)
-                    }
+                    newArray.append(element)
                 }
                 
             } else if i == indexMax {
@@ -142,9 +150,7 @@ struct Calculator {
                                 newArray.append(element)
                             }
                         }
-                    } else {
-                        newArray.append(element)
-                    }
+                    } 
                 //i is + or -
                 } else if element == "+" || element == "-" {
                     newArray.append(element)
@@ -152,8 +158,8 @@ struct Calculator {
                 //i is x
                 } else if element == "x" {
                     //check if is a succession of multiplications
-                    if i > 3 {
-                        let elementLessTwo = elements[-2]
+                    if i >= 3 {
+                        let elementLessTwo = elements[i - 2]
                         if elementLessTwo == "x" || elementLessTwo == "/" {
                             let lastElementInNewArray = Double(newArray.last!)
                             let lastIndexInNewArray = newArray.count - 1
@@ -232,11 +238,14 @@ struct Calculator {
         return String(finalResult)
     }
     
-    func giveResult() -> String {
+    mutating func giveResult() -> String {
         let newArrayLessMultiAndDivi = findPriorityCalculate()
         print("in func giveResult newArrayless ... = \(newArrayLessMultiAndDivi)")
         let result = makeAdditionAndSubstraction(data: newArrayLessMultiAndDivi)
         print("result = \(result)")
+        
+        resultIsGiven = true
+        resultCalcul = result
 
         return result
     }
