@@ -199,7 +199,7 @@ struct Calculator {
                             }
                         }
                     } else {
-                        newArray.append(elementIsMultiplication(elements: elements, i: i))
+                        newArray.append(elementIsDevision(elements: elements, i: i))
                     }
                     
                     

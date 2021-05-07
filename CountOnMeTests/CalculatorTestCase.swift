@@ -44,6 +44,12 @@ class CalculatorTestCase: XCTestCase {
         XCTAssertTrue(calc.canAddOperator)
     }
     
+    func testGivenLastElementInArrayIsntOperator_WhenMakeDivision_ThenShouldBeReturnThree() {
+        calc.elements = ["9", "/", "3"]
+        let expectedResult = String(3.0)
+        XCTAssertEqual(calc.giveResult(), expectedResult)
+    }
+    
     func testGivenString_WhenConvertToArrayBySplitBySpace_ThenShouldBeReturn(){
         let exempleString = "2 + 3 / 4"
         
