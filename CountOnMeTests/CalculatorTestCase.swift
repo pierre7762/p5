@@ -137,4 +137,12 @@ class CalculatorTestCase: XCTestCase {
         
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
+    
+    func testGivenArrayOfThreeOperations_WhenAllOperationsAreMultiplicationByFiveAndFinishWithDivision_ThenShouldReturnTwentyFive() {
+        calc.elements = ["5", "x", "5", "x", "5", "/", "5"]
+        
+        let expectedResult = "25.0"
+        
+        XCTAssertEqual(calc.giveResult(), expectedResult)
+    }
 }

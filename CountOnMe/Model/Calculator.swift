@@ -180,11 +180,32 @@ struct Calculator {
                 
                 //i is /
                 } else {
-                    if checkIfIsNotDevisionByZero(firstElement: elements[i - 1], secondElement: elements[i + 1]){
-                        newArray.append(elementIsDevision(elements: elements, i: i))
+                    if i >= 3 {
+                        let elementLessTwo = elements[i - 2]
+                        if elementLessTwo == "x" || elementLessTwo == "/" {
+                            let lastElementInNewArray = Double(newArray.last!)
+                            let lastIndexInNewArray = newArray.count - 1
+                            
+                            let result = lastElementInNewArray! / Double(elements[i + 1])!
+                            
+                            newArray[lastIndexInNewArray] = String(result)
+                            
+                            
+                        } else {
+                            if checkIfIsNotDevisionByZero(firstElement: elements[i - 1], secondElement: elements[i + 1]){
+                                newArray.append(elementIsDevision(elements: elements, i: i))
+                            } else {
+                                newArray.append(" / 0 = impossible")
+                            }
+                        }
                     } else {
-                        newArray.append(" / 0 = impossible")
+                        newArray.append(elementIsMultiplication(elements: elements, i: i))
                     }
+                    
+                    
+                    
+                    
+                    
                 }
             }
         }
