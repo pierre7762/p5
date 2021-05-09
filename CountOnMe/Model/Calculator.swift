@@ -26,8 +26,9 @@ struct Calculator {
     
     var canAddOperator: Bool {
         var ok = false
-        
-        if elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" {
+
+        if elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" && elements.last != "" {
+
             ok = true
         }
         return ok
@@ -41,8 +42,19 @@ struct Calculator {
     }
     
     //MARK: Functions
-    func updateElements(text: String) -> [String] {
-        text.split(separator: " ").map { "\($0)" }
+    func checkIfCanAddOperator() -> Bool{
+        var ok = false
+        
+        if elements.last != "+" && elements.last != "-" && elements.last != "x" && elements.last != "/" {
+            
+            ok = true
+        }
+        
+        return ok
+    }
+    
+    mutating func updateElements(text: String) {
+       return elements = text.split(separator: " ").map { "\($0)" }
     }
     
     func checkIfResultIsGiven() -> Bool {
@@ -50,6 +62,58 @@ struct Calculator {
             return true
         }
         return false
+    }
+    
+    mutating func changeLastOperator(textView: UITextView, oper: String) {
+        let lastElementIndex = elements.count - 1
+        
+        elements[lastElementIndex] = oper
+    
+        var txtInElements = ""
+        for element in elements {
+            txtInElements.append("\(element) ")
+        }
+        textView.text = txtInElements
+    }
+    
+    mutating func actionButton(textView: UITextView, oper: String) {
+        if checkIfResultIsGiven() {
+            self.resetElementsAndAddBeforeResult(textView: textView)
+        }
+        
+        if elements.count == 0 {
+            if oper == "-" {
+                if checkIfCanAddOperator() {
+                    textView.text.append(" \(oper) ")
+                    updateElements(text: textView.text)
+                }
+            }
+        } else if elements.count == 1 {
+            if elements[0] == "-" || elements[0] == "+"{
+                if oper == "-" || oper == "+" {
+                    if checkIfCanAddOperator() {
+                        textView.text.append(" \(oper) ")
+                        updateElements(text: textView.text)
+                    } else {
+                        changeLastOperator(textView: textView, oper: "\(oper)")
+                    }
+                }
+            } else if elements[0] != "-" && elements[0] != "+" && elements[0] != "x" && elements[0] != "/" {
+                if checkIfCanAddOperator() {
+                    textView.text.append(" \(oper) ")
+                    updateElements(text: textView.text)
+                } else {
+                    changeLastOperator(textView: textView, oper: "\(oper)")
+                }
+            }
+        } else if elements.count > 1 {
+            if checkIfCanAddOperator() {
+                textView.text.append(" \(oper) ")
+                updateElements(text: textView.text)
+            } else {
+                changeLastOperator(textView: textView, oper: "\(oper)")
+            }
+        }
     }
     
     mutating func resetElementsAndAddBeforeResult(textView: UITextView) {
@@ -176,10 +240,15 @@ struct Calculator {
                         newArray.append(elementIsMultiplication(elements: elements, i: i))
                     }
                     
-                    
-                
                 //i is /
                 } else {
+                    if element == "/" {
+                        if elements[i - 1] == "0" || elements[i + 1] == "0"{
+                            newArray = [" / 0 = impossible"]
+                            return newArray
+                        }
+                    }
+                    
                     if i >= 3 {
                         let elementLessTwo = elements[i - 2]
                         if elementLessTwo == "x" || elementLessTwo == "/" {
@@ -194,18 +263,12 @@ struct Calculator {
                         } else {
                             if checkIfIsNotDevisionByZero(firstElement: elements[i - 1], secondElement: elements[i + 1]){
                                 newArray.append(elementIsDevision(elements: elements, i: i))
-                            } else {
-                                newArray.append(" / 0 = impossible")
                             }
                         }
                     } else {
                         newArray.append(elementIsDevision(elements: elements, i: i))
                     }
-                    
-                    
-                    
-                    
-                    
+      
                 }
             }
         }
@@ -251,7 +314,7 @@ struct Calculator {
                         operatorUse = "-"
                     }
                 } else {
-                    return " : impossible"
+                    return " Division par zéro impossible"
                 }
             }
         }
@@ -265,10 +328,11 @@ struct Calculator {
         let result = makeAdditionAndSubstraction(data: newArrayLessMultiAndDivi)
         print("result = \(result)")
         
+        
         resultIsGiven = true
         resultCalcul = result
 
-        return result
+        return resultCalcul
     }
     
 }

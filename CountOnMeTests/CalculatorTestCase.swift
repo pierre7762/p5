@@ -17,7 +17,7 @@ class CalculatorTestCase: XCTestCase {
         super.setUp()
         calc = Calculator()
     }
-
+    
     func testGivenArrayIsEmpty_WhenAddFourElements_ThenResulShouldBeTrue() {
         // When
         calc.elements = ["2", "+", "8", "+"]
@@ -25,6 +25,74 @@ class CalculatorTestCase: XCTestCase {
         //Then
         XCTAssertTrue(calc.expressionHaveEnoughElement)
     }
+    
+    func testGivenCalculator_WhenUserPressedOperator_ThenTheOperatorIsAppend() {
+        let textView = UITextView()
+        textView.text = "2 + 4"
+        calc.elements = ["2", "+", "4"]
+        
+        calc.changeLastOperator(textView: textView, oper: "+")
+
+        XCTAssertTrue(calc.elements.last == "+")
+    }
+    
+    func testGivenStringOperationWhoFinishByAnOperator_WhenUserSelectedAnOtherOperator_ThenTheOperatorChange() {
+        let textView = UITextView()
+        textView.text = "2 + 4 -"
+        calc.elements = ["2", "+", "4", "-"]
+        
+        calc.actionButton(textView: textView, oper: "+")
+        
+        XCTAssertTrue(calc.elements.last == "+")
+    }
+    
+    func testGivenArrayEmpty_WhenUserSelectedMultipli_ThenReturnEmpty() {
+        let textView = UITextView()
+        textView.text = ""
+        calc.elements = []
+        
+        calc.actionButton(textView: textView, oper: "x")
+        
+        XCTAssertTrue(calc.elements == [])
+    }
+    
+    func testGivenResultIsGiven_WhenUserSelectedMultipli_ThenReturnBeforeResultAndMultipli() {
+        let textView = UITextView()
+        calc.resultCalcul = "5"
+        calc.resultIsGiven = true
+        
+        let resultExpented = ["5", "x"]
+        
+        calc.actionButton(textView: textView, oper: "x")
+        
+        XCTAssertEqual(calc.elements , resultExpented)
+    }
+    
+    func testGivenArrayIsEmpty_WhenUserSelectedLess_ThenReturnLess() {
+        let textView = UITextView()
+        calc.resultCalcul = ""
+        calc.resultIsGiven = false
+        
+        let resultExpented = ["-"]
+        
+        calc.actionButton(textView: textView, oper: "-")
+        
+        XCTAssertEqual(calc.elements , resultExpented)
+    }
+    
+    func testGivenArrayWithJustLess_WhenUserSelectedAdd_ThenReturnAdd() {
+        let textView = UITextView()
+        calc.resultCalcul = "-"
+        calc.resultIsGiven = false
+        calc.elements = ["-"]
+        
+        let resultExpented = ["+"]
+        
+        calc.actionButton(textView: textView, oper: "+")
+        
+        XCTAssertEqual(calc.elements , resultExpented)
+    }
+    
     
     func testGivenArrayIsEmpty_WhenAddTwoElements_ThenResulShouldBeFalse() {
         calc.elements = ["2", "+"]
@@ -50,12 +118,10 @@ class CalculatorTestCase: XCTestCase {
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
     
-    func testGivenString_WhenConvertToArrayBySplitBySpace_ThenShouldBeReturn(){
-        let exempleString = "2 + 3 / 4"
-        
-        let expectedResult = ["2", "+", "3", "/", "4"]
-        
-        XCTAssertEqual(calc.updateElements(text: exempleString), expectedResult)
+    func testGivenLastElementInArrayIsntOperator_WhenMakeDivisionByZero_ThenShouldBeReturnImpossible() {
+        calc.elements = ["9", "/", "0"]
+        let expectedResult = " Division par zéro impossible"
+        XCTAssertEqual(calc.giveResult(), expectedResult)
     }
     
     func testGivenCalculator_WhenResultGivenIsFalse_ThenResultIsFalse() {
@@ -121,9 +187,9 @@ class CalculatorTestCase: XCTestCase {
     }
     
     func testGivenArrayWithAllCalculOperatorsAndDivisionByZero_WhenAllOperationsArePrresnet_ThenShouldReturnImpossible() {
-        calc.elements = ["1.0", "+", "6.0", "/", "0", "-", "14.0", "/", "4.0"]
+        calc.elements = ["1.0", "/", "6.0", "/", "0", "-", "14.0", "/", "4.0"]
         
-        let expectedResult = " : impossible"
+        let expectedResult = " Division par zéro impossible"
         
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
