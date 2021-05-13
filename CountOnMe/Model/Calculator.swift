@@ -319,7 +319,13 @@ struct Calculator {
             }
         }
         print(finalResult)
+        if floor(finalResult) == finalResult{
+            return String(Int(finalResult))
+        }
+        
         return String(finalResult)
+        
+       
     }
     
     mutating func giveResult() -> String {

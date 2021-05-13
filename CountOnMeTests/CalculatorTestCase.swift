@@ -112,9 +112,9 @@ class CalculatorTestCase: XCTestCase {
         XCTAssertTrue(calc.canAddOperator)
     }
     
-    func testGivenLastElementInArrayIsntOperator_WhenMakeDivision_ThenShouldBeReturnThree() {
-        calc.elements = ["9", "/", "3"]
-        let expectedResult = String(3.0)
+    func testGivenLastElementInArrayIsntOperator_WhenMakeDivision_ThenShouldBeReturnThreeDotOne() {
+        calc.elements = ["9.3", "/", "3"]
+        let expectedResult = String(3.1)
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
     
@@ -197,7 +197,7 @@ class CalculatorTestCase: XCTestCase {
     func testGivenArrayOfThreeOperations_WhenAllOperationsAreMultiplicationByFive_ThenShouldReturnOneHundredTwentyFive() {
         calc.elements = ["5", "x", "5", "x", "5"]
         
-        let expectedResult = "125.0"
+        let expectedResult = "125"
         
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
@@ -205,7 +205,7 @@ class CalculatorTestCase: XCTestCase {
     func testGivenArrayOfThreeOperations_WhenAllOperationsAreMultiplicationByFiveAndFinishWithAddition_ThenShouldReturnOneHundredThirty() {
         calc.elements = ["5", "x", "5", "x", "5", "+", "5"]
         
-        let expectedResult = "130.0"
+        let expectedResult = "130"
         
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
@@ -213,7 +213,7 @@ class CalculatorTestCase: XCTestCase {
     func testGivenArrayOfThreeOperations_WhenAllOperationsAreMultiplicationByFiveAndFinishWithDivision_ThenShouldReturnTwentyFive() {
         calc.elements = ["5", "x", "5", "x", "5", "/", "5"]
         
-        let expectedResult = "25.0"
+        let expectedResult = "25"
         
         XCTAssertEqual(calc.giveResult(), expectedResult)
     }
